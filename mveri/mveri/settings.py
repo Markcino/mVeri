@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     "mveri.apps.MveriConfig",
     "frontend.apps.FrontendConfig",
 
-    ### 3rd party apps
+    # 3rd party apps
     'rest_framework_simplejwt',
 ]
 
