@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "mveri.apps.MveriConfig",
+    "frontend.apps.FrontendConfig",
 
     ### 3rd party apps
     'rest_framework_simplejwt',
