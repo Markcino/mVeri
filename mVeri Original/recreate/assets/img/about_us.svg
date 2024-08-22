@@ -1,0 +1,13 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="transparent"/>
+  <g>
+    <rect x="100" y="100" width="200" height="300" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="150" y="150" font-family="Arial" font-size="20" fill="#000">Document Management</text>
+    <circle cx="400" cy="200" r="50" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="375" y="205" font-family="Arial" font-size="20" fill="#000">Requests</text>
+    <rect x="500" y="100" width="200" height="300" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="550" y="150" font-family="Arial" font-size="20" fill="#000">Verified</text>
+    <line x1="300" y1="250" x2="400" y2="200" stroke="#000" stroke-width="2"/>
+    <line x1="450" y1="200" x2="500" y2="250" stroke="#000" stroke-width="2"/>
+  </g>
+</svg>

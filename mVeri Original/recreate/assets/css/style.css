@@ -1,33 +1,49 @@
 :root{
+    --colorprimary: #00040f;
+    --coloraccent: #05f903;
+    --colorlinks: #0abefb;
+    --ff: 'Poppins', sans-serif;
+    --h1: bold 50px/70px var(--ff);
+    --h2: bold 36px/36px var(--ff);
+    --h3: bold 24px/30px var(--ff);
+    --links: bold 18px/18px var(--ff);
+    --p2: 30px/36px var(--ff);
+    --p: 18px/30px var(--ff);
     --transition: 0.3s ease-in-out;
 }
+
+h1,
+h2,
+h3,
+p,
+.link,
+.p2{
+    margin: 0px;
+}
+h1{font: var(--h1);}
+h2{font: var(--h2);}
+h3{font: var(--h3);}
+.links{font: var(--links);}
+.p2{font: var(--p2);}
+p{font: var(--p);}
 
 html{
     scroll-behavior: smooth;
 }
 
 body{
-    background-color: #00040f;
+    font-family: var(--ff);
     margin: auto;
     padding: 0px;
+    background-color: var(--colorprimary);
+    color: white;
 }
 
 .section{
     width: 90vw;
-    max-width: 1200px;
+    max-width: 1440px;
     margin: auto;
-    overflow: hidden;
-    position: relative;
 }
-
-
-.section .overlap {
-    position: absolute;
-    width: 937px;
-    height: 1191px;
-    top: 1178px;
-    left: -867px;
-  }
 
 header{
     margin-top: 35px;
@@ -38,7 +54,6 @@ header{
 }
 .logo{
     width: 50px;
-
 }
 
 a{
@@ -59,7 +74,7 @@ header a{
 .nav-menu{
     display: flex;
     align-items: center;
-    gap: 60px;
+    gap: 50px;
 }
 
 .nav-menu li{
@@ -77,7 +92,45 @@ header a{
     margin: 5px auto;
     transition: var(--transition);
     background-color: white;
+}
 
+
+.column{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.hero div{
+    flex: 1;
+}
+img{
+    width: 100%
+}
+.button{
+    font: var(--links);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0px 20px;
+    height: 60px;
+    border: solid 2px bisque;
+    border-radius: 10px;
+}
+.button:hover{
+    border: solid 2px cornflowerblue;
+    transition: var(--transition);
+}
+#primary-links{
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.about-us div{
+    flex: 1;
 }
 
 @media (max-width: 800px){
@@ -91,13 +144,14 @@ header a{
         transform: translateY(8px) rotate(45deg);
     }
     .hamburger.active .bar:nth-child(3){
-        transform: translateY(-8px) rotate(45deg);
+        transform: translateY(-8px) rotate(-45deg);
     }
     .nav-menu{
         padding: 40px;
         background-color: #00040f;
         position: fixed;
         right: -100%;
+        top: 80px;
         align-items: flex-end;
         flex-direction: column;
         height: 100%;
@@ -111,5 +165,11 @@ header a{
     .nav-menu.active{
         right: 0;
         transition: var(--transition);
+    }
+    .hero{
+        flex-direction: column;
+    }
+    .about-us{
+        flex-direction: column-reverse;
     }
 }
