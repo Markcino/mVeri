@@ -9,51 +9,51 @@ from django.contrib import messages
 
 def register(request):
     return render(request, "backend/account/register.html")
-def login(request):
-    try:
-        form = AuthenticationForm()
-        if request.method == "POST":
-            form = AuthenticationForm(request, data=request.POST)
+def do_login(request):
+    # try:
+    form = AuthenticationForm()
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
 
-            if form.is_valid():
-                username = request.POST.get('username')
-                password = request.POST.get('password')
+        if form.is_valid():
+            username = request.POST.get('username')
+            password = request.POST.get('password')
 
-                user = authenticate(
-                    request, username=username, password=password)
+            user = authenticate(
+                request, username=username, password=password)
 
-                if user is not None and user.is_active and user.is_administrator:
-                    login(request, user)
-                    messages.success(request, f"Welcome, {user.get_username()}!")
+            if user is not None and user.is_active and user.is_administrator:
+                login(request, user)
+                messages.success(request, f"Welcome, {user.get_username()}!")
 
-                    return redirect('administrator-dashboard')
-                elif user is not None and user.is_active and user.is_student:
-                    login(request, user)
-                    messages.success(request, f"Welcome, {user.get_username()}!")
+                return redirect('administrator-dashboard')
+            if user is not None and user.is_active and user.is_student:
+                login(request, user)
+                messages.success(request, f"Welcome, {user.get_username()}!")
 
-                    return redirect('student-dashboard')
-                elif user is not None and user.is_active and user.is_superuser:
-                    login(request, user)
-                    messages.success(request, f"Welcome, {user.get_username()}!")
+                return redirect('student-dashboard')
+            if user is not None and user.is_active and user.is_superuser:
+                login(request, user)
+                messages.success(request, f"Welcome, {user.get_username()}!")
 
-                    return redirect('admin-dashboard')
-                else:
-                    # Handle invalid user or insufficient privileges
-                    messages.error(
-                        request, "Invalid credentials or insufficient privileges")
-                    return redirect('index')
-
+                return redirect('super-admin-dashboard')
             else:
-                # Handle form validation errors
-                errors = form.errors.as_json()
-                return HttpResponse(errors, status=400)
+                # Handle invalid user or insufficient privileges
+                messages.error(
+                    request, "Invalid credentials or insufficient privileges")
+                return redirect('index')
 
-        context = {'LoginForm': form}
+        else:
+            # Handle form validation errors
+            errors = form.errors.as_json()
+            return HttpResponse(errors, status=400)
 
-        return render(request, "backend/account/login.html", context)
-    except Exception as e:
-        # Handle any other exceptions
-        return HttpResponse("An error occurred: {}".format(str(e)))
+    context = {'LoginForm': form}
+
+    return render(request, "backend/account/login.html", context)
+    # except Exception as e:
+    #     # Handle any other exceptions
+    #     return HttpResponse("An error occurred: {}".format(str(e)))
 
     # if request.method == "POST":
     #     form = AuthenticationForm(request, data=request.POST)
@@ -88,7 +88,7 @@ def login(request):
 
 # User Logout View
 @login_required(login_url='do_login')
-def logout(request):
+def do_logout(request):
     logout(request)
     messages.success(request, "You have successfully logged out.")
 

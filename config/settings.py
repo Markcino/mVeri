@@ -42,6 +42,9 @@ INSTALLED_APPS = [
 
     ## Account End Apps ##
     'accounts.apps.AccountsConfig',
+
+    ## Super Admin Apps ##
+    'superadmin.apps.SuperadminConfig',
 ]
 
 MIDDLEWARE = [
