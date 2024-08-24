@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 
-def CustomUser(AbstractBaseUser, PermissionsMixin):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     username:None
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(max_length=30, blank=True)
@@ -18,6 +18,10 @@ def CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=False)
     is_superuser = models.BooleanField(_('superuser'), default=False)
+    is_student = models.BooleanField(_('student'),
+        default=False)
+    is_administrator = models.BooleanField(_('administrator'),
+        default=False)
 
     objects = CustomUserManager()
 
