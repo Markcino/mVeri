@@ -1,133 +1,273 @@
-
 {% load static %}
-{% load crispy_forms_tags %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Registration | mVeri</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta content="Mark Allen Gbalaze" name="author" />
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}" />
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css" />
+  </head>
 
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-  <title>Register - WORK FORCE</title>
-  <meta content="Register for access to the WORK FORCE platform" name="description">
-  <meta content="" name="keywords">
-
-  <!-- Favicons -->
-  <link href="{% static 'dashboard/assets/img/favicon.png' %}" rel="icon">
-  <link href="{% static 'dashboard/assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
-  <link href="{% static 'dashboard/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-  <link href="{% static 'dashboard/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
-  <link href="{% static 'dashboard/assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
-  <link href="{% static 'dashboard/assets/vendor/quill/quill.snow.css' %}" rel="stylesheet">
-  <link href="{% static 'dashboard/assets/vendor/quill/quill.bubble.css' %}" rel="stylesheet">
-  <link href="{% static 'dashboard/assets/vendor/remixicon/remixicon.css' %}" rel="stylesheet">
-  <link href="{% static 'dashboard/assets/vendor/simple-datatables/style.css' %}" rel="stylesheet">
-
-  <!-- Template Main CSS File -->
-  <link href="{% static 'dashboard/assets/css/style.css' %}" rel="stylesheet">
-
-</head>
-
-<body>
-<main>
-    <div class="container">
-        <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-
-                        <div class="d-flex justify-content-center py-4">
-                            <a href="{% url 'home' %}" class="logo d-flex align-items-center w-auto">
-                                <img src="{% static 'assets/img/logo.png' %}" alt="">
-                                <span class="d-none d-lg-block">WORK FORCE</span>
-                            </a>
-                        </div><!-- End Logo -->
-
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <div class="pt-4 pb-2">
-                                    <h5 class="card-title text-center pb-0 fs-4">Register</h5>
-                                    <p class="text-center small">Fill out the form below to create an account</p>
-                                </div>
-
-                                {% if messages %}
-                                    {% for message in messages %}
-                                        <div class="alert alert-{{ message.tags }} mt-3" role="alert">
-                                            {{ message|safe }}
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <form method="post" class="row g-3 needs-validation" novalidate>
-                                    {% csrf_token %}
-                                    {{ RegisterForm|crispy }}
-                                  
-
-                                    <div class="col-12">
-                                        <button class="btn btn-primary w-100" type="submit">Register</button>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <p class="small mb-0">Already have an account? <a href="{% url 'do_login' %}">Login here</a></p>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="credits">
-                            Designed by <a href="#">E-Digital Network</a>
-                        </div>
-                    </div>
-                </div>
+  <body class="auth-body-bg">
+    <div class="bg-overlay"></div>
+    <div class="wrapper-page">
+      <div class="container-fluid p-0">
+        <div class="card">
+          <div class="card-body">
+            <div class="text-center mt-4">
+              <div class="mb-3">
+                <a href="" class="auth-logo">
+                  <img src="{% static 'frontend/img/ellipse-2355.svg' %}" height="30" class="mx-auto" alt="" />
+                </a>
+              </div>
             </div>
-        </section>
+
+            <h4 class="text-muted text-center font-size-18"><b>Registration Form</b></h4>
+
+            <div class="p-3">
+              <form method="POST" class="form-horizontal mt-3">
+                {% csrf_token %}
+                
+                <div class="form-group mb-3 row">
+                  <div class="col-12">
+                    <input class="form-control" type="email" name="email" required placeholder="Email">
+                  </div>
+                </div>
+
+                <div class="form-group mb-3 row">
+                  <div class="col-12">
+                    <input class="form-control" type="text" name="first_name" required placeholder="First Name">
+                  </div>
+                </div>
+
+                <div class="form-group mb-3 row">
+                  <div class="col-12">
+                    <input class="form-control" type="text" name="last_name" required placeholder="Last Name">
+                  </div>
+                </div>
+
+                <div class="form-group mb-3 row">
+                  <div class="col-12">
+                    <input class="form-control" type="password" name="password1" required placeholder="Password">
+                  </div>
+                </div>
+
+                <div class="form-group mb-3 row">
+                  <div class="col-12">
+                    <input class="form-control" type="password" name="password2" required placeholder="Confirm Password">
+                  </div>
+                </div>
+
+                <!-- Exclusive checkboxes -->
+                <div class="form-group mb-3 row">
+                  <div class="col-12">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="isStudent" name="isStudent" onclick="toggleExclusiveCheckbox('isStudent', 'isSchoolAdmin')">
+                      <label class="form-label ms-1 fw-normal" for="isStudent">Is Student</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="isSchoolAdmin" name="isSchoolAdmin" onclick="toggleExclusiveCheckbox('isSchoolAdmin', 'isStudent')">
+                      <label class="form-label ms-1 fw-normal" for="isSchoolAdmin">Is School Administrator</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="acceptTerms" name="acceptTerms" required>
+                      <label class="form-label ms-1 fw-normal" for="acceptTerms">I accept <a href="#" class="text-muted">Terms and Conditions</a></label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- School Admin Fields -->
+                <div id="schoolAdminFields" style="display: none;">
+                  <div class="form-group mb-3 row">
+                    <div class="col-12">
+                      <input class="form-control" type="text" name="institution_name" placeholder="Institution Name">
+                    </div>
+                  </div>
+
+                  <div class="form-group mb-3 row">
+                    <div class="col-12">
+                      <input class="form-control" type="text" name="institution_address" placeholder="Institution Address">
+                    </div>
+                  </div>
+
+                  <div class="form-group mb-3 row">
+                    <div class="col-12">
+                      <input class="form-control" type="text" name="phone_number" placeholder="Phone Number">
+                    </div>
+                  </div>
+
+                  <div class="form-group mb-3 row">
+                    <div class="col-12">
+                      <input class="form-control" type="text" name="business_reg_number" placeholder="Institution Business Registration Number">
+                    </div>
+                  </div>
+
+                  <div class="form-group mb-3 row">
+                    <div class="col-12">
+                      <input class="form-control" type="file" name="business_cert">
+                      <small class="form-text text-muted">Upload Business Registration Certificate (Optional)</small>
+                    </div>
+                  </div>
+
+                  <div class="form-group mb-3 row">
+                    <div class="col-12">
+                      <select class="form-control" name="position">
+                        <option value="">Select Position</option>
+                        <option value="proprietor">Proprietor</option>
+                        <option value="principal">Principal</option>
+                        <option value="registrar">Registrar</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Student Fields -->
+                <div id="studentFields" style="display: none;">
+                  <div class="form-group mb-3 row">
+                    <div class="col-12">
+                      <select class="form-control" name="educational_status" onchange="toggleEducationalStatus(this)">
+                        <option value="">Select Educational Status</option>
+                        <option value="graduate">Graduate</option>
+                        <option value="ongoing">Ongoing</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div id="graduateFields" style="display: none;">
+                    <div class="form-group mb-3 row">
+                      <div class="col-12">
+                        <input class="form-control" type="text" name="school_name" placeholder="School Name">
+                        <small class="form-text text-muted">Search and Select School</small>
+                      </div>
+                    </div>
+
+                    <div class="form-group mb-3 row">
+                      <div class="col-12">
+                        <select class="form-control" name="degree_type">
+                          <option value="">Select Degree Type</option>
+                          <option value="undergraduate">Undergraduate Degree</option>
+                          <option value="master">Master Degree</option>
+                          <option value="phd">PhD</option>
+                          <option value="highschool">High School Graduate</option>
+                          <option value="vocational">Vocational School Certificate</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-group mb-3 row">
+                      <div class="col-12">
+                        <input class="form-control" type="month" name="graduation_date" placeholder="Month and Year of Graduation">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="ongoingFields" style="display: none;">
+                    <div class="form-group mb-3 row">
+                      <div class="col-12">
+                        <select class="form-control" name="class">
+                          <option value="">Select Class</option>
+                          <option value="k_i">K-I</option>
+                          <option value="k_ii">K-II</option>
+                          <option value="1">1st Grade</option>
+                          <option value="2">2nd Grade</option>
+                          <!-- Remaining options -->
+                          <option value="12">12th Grade</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-group mb-3 row">
+                      <div class="col-12">
+                        <input class="form-control" type="text" name="institution" placeholder="Institution">
+                        <small class="form-text text-muted">Search and Select Institution</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group text-center row mt-3 pt-1">
+                  <div class="col-12">
+                    <button class="btn btn-info w-100 waves-effect waves-light" type="submit">Register</button>
+                  </div>
+                </div>
+
+                <div class="form-group mt-2 mb-0 row">
+                  <div class="col-12 mt-3 text-center">
+                    <a href="{% url 'do_login' %}" class="text-muted">Already have an account?</a>
+                  </div>
+                </div>
+              </form>
+              <!-- end form -->
+            </div>
+            <!-- end -->
+          </div>
+          <!-- end cardbody -->
+        </div>
+        <!-- end card -->
+      </div>
+      <!-- end container -->
     </div>
-</main>
-<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <!-- end -->
 
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const roleRadioButtons = document.querySelectorAll('input[name="role"]');
-        const workerCodeField = document.querySelector('.field-worker_code');
-
-        function toggleWorkerCodeField() {
-            const selectedRole = document.querySelector('input[name="role"]:checked').value;
-            if (selectedRole === 'worker') {
-                workerCodeField.style.display = 'block';
-            } else {
-                workerCodeField.style.display = 'none';
-            }
+    <!-- JS Scripts -->
+    <script>
+      // Exclusive checkboxes logic
+      function toggleExclusiveCheckbox(checkboxId, otherCheckboxId) {
+        const checkbox = document.getElementById(checkboxId);
+        const otherCheckbox = document.getElementById(otherCheckboxId);
+        if (checkbox.checked) {
+          otherCheckbox.checked = false;
+          showRelevantFields();
+        } else {
+          hideRelevantFields();
         }
+      }
 
-        roleRadioButtons.forEach(radio => radio.addEventListener('change', toggleWorkerCodeField));
+      function showRelevantFields() {
+        const isStudentChecked = document.getElementById('isStudent').checked;
+        const isSchoolAdminChecked = document.getElementById('isSchoolAdmin').checked;
 
-        // Initial check on page load
-        toggleWorkerCodeField();
-    });
-</script>
+        document.getElementById('studentFields').style.display = isStudentChecked ? 'block' : 'none';
+        document.getElementById('schoolAdminFields').style.display = isSchoolAdminChecked ? 'block' : 'none';
+        hideSubFields();  // Hide the subfields (graduate/ongoing) when a new selection is made
+      }
 
-<!-- Vendor JS Files -->
-<script src="{% static 'dashboard/assets/vendor/apexcharts/apexcharts.min.js' %}"></script>
-<script src="{% static 'dashboard/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'dashboard/assets/vendor/chart.js/chart.umd.js' %}"></script>
-<script src="{% static 'dashboard/assets/vendor/echarts/echarts.min.js' %}"></script>
-<script src="{% static 'dashboard/assets/vendor/quill/quill.js' %}"></script>
-<script src="{% static 'dashboard/assets/vendor/simple-datatables/simple-datatables.js' %}"></script>
-<script src="{% static 'dashboard/assets/vendor/tinymce/tinymce.min.js' %}"></script>
-<script src="{% static 'dashboard/assets/vendor/php-email-form/validate.js' %}"></script>
+      function hideSubFields() {
+        document.getElementById('graduateFields').style.display = 'none';
+        document.getElementById('ongoingFields').style.display = 'none';
+      }
 
-<!-- Template Main JS File -->
-<script src="{% static 'dashboard/assets/js/main.js' %}"></script>
+      function toggleEducationalStatus(selectElement) {
+        const status = selectElement.value;
+        document.getElementById('graduateFields').style.display = status === 'graduate' ? 'block' : 'none';
+        document.getElementById('ongoingFields').style.display = status === 'ongoing' ? 'block' : 'none';
+      }
 
-</body>
+      // Ensure the institution name is filled in
+      document.getElementById('studentFields').querySelector('input[name="institution"]').addEventListener('input', function () {
+        if (this.value.trim() === '') {
+          if (confirm("Do you want to proceed while we await your school to be onboarded?")) {
+            // Allow form submission
+          } else {
+            // Prevent form submission
+            this.focus();
+          }
+        }
+      });
 
+      // Graduation date handling
+      document.querySelector('input[name="graduation_date"]').addEventListener('change', function () {
+        const value = this.value; // e.g., "2024-08"
+        const [year, month] = value.split('-');
+        console.log(`Year: ${year}, Month: ${month}`);
+      });
+    </script>
+    
+  </body>
 </html>
-

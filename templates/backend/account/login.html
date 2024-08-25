@@ -3,31 +3,31 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Login | Workforce</title>
+    <title>Login | mVeri</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta content="Mark Allen Gbalaze" name="author" />
     <!-- App favicon -->
     <link
       rel="shortcut icon"
-      href="{% static 'backend/account/assets/images/favicon.png' %}"
+      href="{% static 'assets/images/favicon.png' %}"
     />
 
     <!-- Bootstrap Css -->
     <link
-      href="{% static 'backend/account/assets/css/bootstrap.min.css' %}"
+      href="{% static 'assets/css/bootstrap.min.css' %}"
       id="bootstrap-style"
       rel="stylesheet"
       type="text/css"
     />
     <!-- Icons Css -->
     <link
-      href="{% static 'backend/account/assets/css/icons.min.css' %}"
+      href="{% static 'assets/css/icons.min.css' %}"
       rel="stylesheet"
       type="text/css"
     />
     <!-- App Css-->
     <link
-      href="{% static 'backend/account/assets/css/app.min.css' %}"
+      href="{% static 'assets/css/app.min.css' %}"
       id="app-style"
       rel="stylesheet"
       type="text/css"
@@ -72,12 +72,12 @@
 
                 <div class="form-group mb-0 row mt-2">
                   <div class="col-sm-7 mt-3">
-                    <a href="#" class="text-muted"
-                      ><i class="mdi mdi-lock"></i> Forgot your password?</a
-                    >
-                    
+                      <a href="#" class="text-muted"><i class="mdi mdi-lock"></i> Forgot your password?</a>
                   </div>
-                </div>
+                  <div class="col-sm-5 mt-3">
+                      <a href="{% url 'register' %}" class="text-muted"><i class="mdi mdi-account-circle"></i> Create an account</a>
+                  </div>
+              </div>
               </form>
             </div>
             <!-- end -->
@@ -92,12 +92,12 @@
 
     <!-- JAVASCRIPT -->
 
-    <script src="{% static 'backend/account/assets/libs/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'backend/account/assets/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'backend/account/assets/libs/metismenu/metisMenu.min.js' %}"></script>
-    <script src="{% static 'backend/account/assets/libs/simplebar/simplebar.min.js' %}"></script>
-    <script src="{% static 'backend/account/assets/libs/node-waves/waves.min.js' %}"></script>
+    <script src="{% static 'assets/libs/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/libs/metismenu/metisMenu.min.js' %}"></script>
+    <script src="{% static 'assets/libs/simplebar/simplebar.min.js' %}"></script>
+    <script src="{% static 'assets/libs/node-waves/waves.min.js' %}"></script>
 
-    <script src="{% static 'backend/account/assets/js/app.js' %}"></script>
+    <script src="{% static 'assets/js/app.js' %}"></script>
   </body>
 </html>

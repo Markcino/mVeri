@@ -9,4 +9,6 @@ urlpatterns = [
     path('', include('frontend.urls')),
     path('account/', include('accounts.urls')),
     path('superadmin/', include('superadmin.urls')),
+    path('schooladmin/', include('schooladmin.urls')),
+    path('student/', include('student.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
