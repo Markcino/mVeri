@@ -39,11 +39,9 @@ def generate_institution_code():
 
 def register(request):
     institution_search = AdministratorProfile.objects.filter(is_incomplete=False, is_completed=True)
-
-    # Only extract the institution names from the queryset
     institution_names = [institution.institution_name for institution in institution_search]
+
     if request.method == 'POST':
-        # Get the form data from the request
         email = request.POST.get('email')
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
@@ -53,43 +51,38 @@ def register(request):
         is_administrator = request.POST.get('isSchoolAdmin')
         accept_terms = request.POST.get('acceptTerms')
 
-        # Validate the form data
         if password1 != password2:
             messages.error(request, "Passwords do not match.")
-            return render(request, 'registration_form.html')
+            return render(request, 'backend/account/register.html', {'institution_names': institution_names})
 
         if not accept_terms:
             messages.error(request, "You must accept the Terms and Conditions.")
-            return render(request, 'registration_form.html')
+            return render(request, 'backend/account/register.html', {'institution_names': institution_names})
 
         if is_student and is_administrator:
             messages.error(request, "You cannot select both Student and School Administrator.")
-            return render(request, 'registration_form.html')
+            return render(request, 'backend/account/register.html', {'institution_names': institution_names})
 
         if not is_student and not is_administrator:
             messages.error(request, "You must select either Student or School Administrator.")
-            return render(request, 'registration_form.html')
+            return render(request, 'backend/account/register.html', {'institution_names': institution_names})
 
-        # try:
-            # Start a transaction
         with transaction.atomic():
-            # Create the user
             user = CustomUser(
                 email=email,
                 first_name=first_name,
                 last_name=last_name,
-                password=make_password(password1),  # Hash the password
+                password=make_password(password1),
                 is_student=bool(is_student),
                 is_administrator=bool(is_administrator),
-                t_and_c=True,  # Terms accepted
+                t_and_c=True,
             )
-            user.save()  # Save the user to the database
+            user.save()
 
-            # Determine if all required fields are filled
             is_complete = True
             is_incomplete = False
+            institution_code = None  # Initialize the variable
 
-            # Create the appropriate profile based on the user's role
             if is_student:
                 graduation_date_str = request.POST.get('graduation_date')
                 if graduation_date_str:
@@ -98,26 +91,32 @@ def register(request):
                         graduation_date = datetime.datetime.strptime(graduation_date_str, '%Y-%m-%d').date()
                     except ValueError:
                         messages.error(request, "Invalid graduation date format.")
-                        return render(request, 'registration_form.html')
+                        return render(request, 'backend/account/register.html', {'institution_names': institution_names})
                 else:
                     graduation_date = None
 
-                school_name = request.POST.get('institution')  # Use the correct field name for student
+                school_name = request.POST.get('school_name')
                 class_name = request.POST.get('class')
                 degree_type = request.POST.get('degree_type')
 
-                # Check for completeness
+                try:
+                    admin_profile = AdministratorProfile.objects.get(institution_name=school_name)
+                    institution_code = admin_profile.institution_code
+                except AdministratorProfile.DoesNotExist:
+                    messages.error(request, "Invalid institution name.")
+                    return render(request, 'backend/account/register.html', {'institution_names': institution_names})
+
                 if not all([school_name, class_name, degree_type, graduation_date]):
                     is_complete = False
                     is_incomplete = True
 
-                # Create the student profile
                 student_profile = StudentProfile(
                     user=user,
                     school_name=school_name,
                     class_name=class_name,
                     degree_type=degree_type,
                     graduation_date=graduation_date,
+                    institution_code=institution_code,
                     is_completed=is_complete,
                     is_incomplete=is_incomplete
                 )
@@ -130,18 +129,12 @@ def register(request):
                 business_reg_number = request.POST.get('business_reg_number')
                 business_cert = request.FILES.get('business_cert', None)
 
-                # Check for completeness
                 if not all([institution_name, institution_address, phone_number, business_reg_number, business_cert]):
                     is_complete = False
                     is_incomplete = True
 
-                # Generate the institution code
                 institution_code = generate_institution_code()
 
-                # Handle the business certificate
-                business_cert = request.FILES.get('business_cert', None)
-
-                # Create the administrator profile
                 admin_profile = AdministratorProfile(
                     user=user,
                     institution_name=institution_name,
@@ -155,20 +148,14 @@ def register(request):
                 )
                 admin_profile.save()
 
-        # If everything is successful, commit the transaction and show a success message
         messages.success(request, 'Registration successful!')
-        return redirect('do_login')  # Redirect to the login page
+        return redirect('do_login')
 
-        # except IntegrityError:
-        #     # If there is any error, roll back the transaction and show an error message
-        #     messages.error(request, "There was an error with the registration. Please try again.")
-        #     return render(request, 'registration_form.html')
-    
-    context ={
+    context = {
         "institution_names": institution_names,
     }
-    # If the request method is GET, render the registration form
     return render(request, "backend/account/register.html", context)
+
 
 # User Login View
 def do_login(request):

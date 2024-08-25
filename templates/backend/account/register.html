@@ -145,7 +145,7 @@
                     <div class="form-group mb-3 row">
                       <div class="col-12">
                         <label for="institution_name">Institution Name</label>
-                        <select class="form-control" id="institution_name" name="institution_name" required>
+                        <select class="form-control" id="institution_name" name="school_name" required>
                             <option value="" disabled selected>Select Institution</option>
                             <option value="Institution Not Found">Institution Not Found</option>
                             {% for name in institution_names %}
@@ -194,7 +194,7 @@ class="form-control" name="degree_type">
                     <div class="form-group mb-3 row">
                       <div class="col-12">
                         <label for="institution">Institution Name</label>
-                        <select class="form-control" id="institution" name="institution" required>
+                        <select class="form-control" id="institution" name="school_name" required>
                             <option value="" disabled selected>Select Institution</option>
                             <option value="Institution Not Found">Institution Not Found</option>
                             {% for name in institution_names %}
