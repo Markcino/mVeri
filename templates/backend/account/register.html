@@ -1,3 +1,5 @@
+
+
 {% load static %}
 <!doctype html>
 <html lang="en">
@@ -142,14 +144,21 @@
                   <div id="graduateFields" style="display: none;">
                     <div class="form-group mb-3 row">
                       <div class="col-12">
-                        <input class="form-control" type="text" name="school_name" placeholder="School Name">
-                        <small class="form-text text-muted">Search and Select School</small>
+                        <label for="institution_name">Institution Name</label>
+                        <select class="form-control" id="institution_name" name="institution_name" required>
+                            <option value="" disabled selected>Select Institution</option>
+                            <option value="Institution Not Found">Institution Not Found</option>
+                            {% for name in institution_names %}
+                                <option value="{{ name }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
                       </div>
                     </div>
 
                     <div class="form-group mb-3 row">
                       <div class="col-12">
-                        <select class="form-control" name="degree_type">
+                        <select
+class="form-control" name="degree_type">
                           <option value="">Select Degree Type</option>
                           <option value="undergraduate">Undergraduate Degree</option>
                           <option value="master">Master Degree</option>
@@ -184,8 +193,14 @@
 
                     <div class="form-group mb-3 row">
                       <div class="col-12">
-                        <input class="form-control" type="text" name="institution" placeholder="Institution">
-                        <small class="form-text text-muted">Search and Select Institution</small>
+                        <label for="institution">Institution Name</label>
+                        <select class="form-control" id="institution" name="institution" required>
+                            <option value="" disabled selected>Select Institution</option>
+                            <option value="Institution Not Found">Institution Not Found</option>
+                            {% for name in institution_names %}
+                                <option value="{{ name }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -214,7 +229,18 @@
       <!-- end container -->
     </div>
     <!-- end -->
+ <!-- JAVASCRIPT -->
 
+    <script src="{% static 'assets/libs/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/libs/metismenu/metisMenu.min.js' %}"></script>
+    <script src="{% static 'assets/libs/simplebar/simplebar.min.js' %}"></script>
+    <script src="{% static 'assets/libs/node-waves/waves.min.js' %}"></script>
+
+    <script src="{% static 'assets/js/app.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- JS Scripts -->
     <script>
       // Exclusive checkboxes logic
@@ -236,6 +262,12 @@
         document.getElementById('studentFields').style.display = isStudentChecked ? 'block' : 'none';
         document.getElementById('schoolAdminFields').style.display = isSchoolAdminChecked ? 'block' : 'none';
         hideSubFields();  // Hide the subfields (graduate/ongoing) when a new selection is made
+
+        // Dynamically add or remove the 'required' attribute based on the selection
+        const institutionName = document.getElementById('institution_name');
+        const institution = document.getElementById('institution');
+        institutionName.required = isStudentChecked && document.getElementById('graduateFields').style.display === 'block';
+        institution.required = isStudentChecked && document.getElementById('ongoingFields').style.display === 'block';
       }
 
       function hideSubFields() {
@@ -247,17 +279,54 @@
         const status = selectElement.value;
         document.getElementById('graduateFields').style.display = status === 'graduate' ? 'block' : 'none';
         document.getElementById('ongoingFields').style.display = status === 'ongoing' ? 'block' : 'none';
+
+        // Update the 'required' attribute for institution_name and institution based on the selection
+        const institutionName = document.getElementById('institution_name');
+        const institution = document.getElementById('institution');
+        institutionName.required = status === 'graduate';
+        institution.required = status === 'ongoing';
       }
 
       // Ensure the institution name is filled in
-      document.getElementById('studentFields').querySelector('input[name="institution"]').addEventListener('input', function () {
-        if (this.value.trim() === '') {
-          if (confirm("Do you want to proceed while we await your school to be onboarded?")) {
-            // Allow form submission
-          } else {
-            // Prevent form submission
-            this.focus();
-          }
+      document.getElementById('institution_name').addEventListener('change', function () {
+        if (this.value === 'Institution Not Found') {
+          Swal.fire({
+            title: 'Institution Not Found',
+            text: 'Would you like to proceed while we onboard your school?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, proceed',
+            cancelButtonText: 'No, go back',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Set default institution name to 'School Not Onboarded'
+              this.value = 'School Not Onboarded';
+            } else {
+              // Redirect to landing page
+              window.location.href = "{% url 'index' %}";
+            }
+          });
+        }
+      });
+
+      document.getElementById('institution').addEventListener('change', function () {
+        if (this.value === 'Institution Not Found') {
+          Swal.fire({
+            title: 'Institution Not Found',
+            text: 'Would you like to proceed while we onboard your school?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, proceed',
+            cancelButtonText: 'No, go back',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Set default institution name to 'School Not Onboarded'
+              this.value = 'School Not Onboarded';
+            } else {
+              // Redirect to landing page
+              window.location.href = "{% url 'index' %}";
+            }
+          });
         }
       });
 
