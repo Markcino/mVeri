@@ -3,7 +3,7 @@
     <div class="d-flex">
         <!-- LOGO -->
         <div class="navbar-brand-box">
-            <a href="{% url 'super-admin-dashboard' %}" class="logo logo-dark">
+            <a href="{% url 'student-dashboard' %}" class="logo logo-dark">
                 <span class="logo-sm">
                     
                     <img src="{% static 'frontend/img/ellipse-2355.svg' %}" alt="logo-sm" height="22">
@@ -13,7 +13,7 @@
                 </span>
             </a>
 
-            <a href="{% url 'super-admin-dashboard' %}" class="logo logo-light">
+            <a href="{% url 'student-dashboard' %}" class="logo logo-light">
                 <span class="logo-sm">
                     <img src="{% static 'frontend/img/ellipse-2355.svg' %}" alt="logo-sm-light" height="22">
                 </span>
@@ -109,12 +109,12 @@
                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <img class="rounded-circle header-profile-user" src="{% static 'frontend/img/ellipse-2355.svg' %}"
                     alt="Header Avatar">
-                <span class="d-none d-xl-inline-block ms-1">Mark A. Gbalazeh</span>
+                <span class="d-none d-xl-inline-block ms-1">{{ request.user }}</span>
                 <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-end">
                 <!-- item-->
-                <a class="dropdown-item" href="#"><i class="ri-user-line align-middle me-1"></i> Profile</a>
+                <a class="dropdown-item" href="{% url 'student-profile' %}"><i class="ri-user-line align-middle me-1"></i> Profile</a>
                 <a class="dropdown-item d-block" href="#"><i class="ri-settings-2-line align-middle me-1"></i> Settings</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="ri-shut-down-line align-middle me-1 text-danger"></i> Logout</a>

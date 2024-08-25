@@ -1,0 +1,197 @@
+{% extends 'backend/student/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block custom_css %}
+
+ <!-- DataTables -->
+  
+ <link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+ <link href="{% static 'assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+ <link href="{% static 'assets/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+
+ <!-- Responsive datatable examples -->
+ <link href="{% static 'assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />     
+
+{% endblock custom_css %}
+
+{% block breadcrumb %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Dashboard</h4>
+
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">mVeri</a></li>
+                    <li class="breadcrumb-item active">Profile</li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock breadcrumb %}
+{% block content %}
+<!-- Profile -->
+<div class="row">
+    <!-- Profile Information -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Profile Information</h5>
+                <button id="edit-btn" class="btn btn-primary btn-sm">Edit</button>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'update-profile' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="profile-image">Profile Image</label>
+                        <div class="text-center">
+                            <img src="{{ user.profile_image.url }}" id="profile-image" class="img-fluid rounded-circle" alt="Profile Image" style="width: 150px; height: 150px;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" class="form-control" value="{{ user.get_name }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" name="phone" class="form-control" value="{{ user.phone_number }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">New Password</label>
+                        <input type="password" id="password" name="password" class="form-control" readonly>
+                        <small class="form-text text-muted">Leave blank if you do not want to change your password.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password</label>
+                        <input type="password" id="confirm-password" name="confirm_password" class="form-control" readonly>
+                    </div>
+                    <button type="submit" id="update-btn" class="btn btn-primary d-none">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription History -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Subscription History</h5>
+            </div>
+            <div class="card-body">
+                <table id="subscriptions-table" class="table table-bordered dt-responsive nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Subscription Plan</th>
+                            <th>Cost</th>
+                            <th>Status</th>
+                            <th>Subscription Date</th>
+                            <th>Countdown</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subscription in subscriptions %}
+                            <tr>
+                                <td>{{ subscription.subscription_plan }}</td>
+                                <td>{{ subscription.subscription_cost }}</td>
+                                <td>{{ subscription.is_active|yesno:"Active,Inactive" }}</td>
+                                <td>{{ subscription.subscription_date }}</td>
+                                <td>
+                                    {% if subscription.subscription_plan == 'Monthly' %}
+                                        <span id="countdown-{{ subscription.id }}" data-end-date="{{ subscription.expiration_date }}"></span>
+                                    {% else %}
+                                        {% if subscription.is_active %}
+                                            <span>Subscription is active</span>
+                                        {% else %}
+                                            <span>Subscription expired</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5">No subscriptions found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block custom_script %}
+<!-- Required datatable js -->
+<script src="{% static 'assets/libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<!-- Buttons examples -->
+<script src="{% static 'assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/libs/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'assets/libs/pdfmake/build/pdfmake.min.js' %}"></script>
+<script src="{% static 'assets/libs/pdfmake/build/vfs_fonts.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
+
+<script src="{% static 'assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-select/js/dataTables.select.min.js' %}"></script>
+
+<!-- Responsive examples -->
+<script src="{% static 'assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Datatable init js -->
+<script src="{% static 'assets/js/pages/datatables.init.js' %}"></script>
+
+
+<script>
+    // DataTable initialization
+    $(document).ready(function() {
+        $('#subscriptions-table').DataTable({
+            responsive: true
+        });
+    
+        // Edit button functionality
+        $('#edit-btn').click(function() {
+            $('#profile-image').prop('readonly', false);
+            $('#email').prop('readonly', false);
+            $('#name').prop('readonly', false);
+            $('#phone').prop('readonly', false);
+            $('#password').prop('readonly', false);
+            $('#confirm-password').prop('readonly', false);
+            $('#update-btn').removeClass('d-none');
+        });
+    
+        // Countdown functionality for monthly subscriptions
+        function calculateCountdown(endDate) {
+            var end = new Date(endDate);
+            var now = new Date();
+            var timeDifference = end - now;
+            if (timeDifference <= 0) {
+                return "Expired";
+            }
+    
+            var days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+    
+            return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+    
+        $('span[id^="countdown-"]').each(function() {
+            var endDate = $(this).data('end-date');
+            $(this).text(calculateCountdown(endDate));
+            setInterval(() => {
+                $(this).text(calculateCountdown(endDate));
+            }, 1000);
+        });
+    });
+    </script>
+{% endblock custom_script %}

@@ -1,0 +1,188 @@
+{% extends 'backend/student/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block custom_css %}
+<!-- DataTables CSS -->
+<link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+<!-- SweetAlert CSS -->
+<link href="{% static 'assets/libs/sweetalert2/sweetalert2.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock custom_css %}
+
+{% block breadcrumb %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Dashboard</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">mVeri</a></li>
+                    <li class="breadcrumb-item active">Request Document</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<!-- Transcript Requests -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center mb-3">
+                <h2 class="card-title mb-0">All Requested Document</h2>
+                <button class="btn btn-success waves-effect waves-light" id="request-document-btn" role="button">Request Document</button>
+            </div>
+            <div class="card-body">
+                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Date Requested</th>
+                            <th>Status</th>
+                            <th>Institution</th>
+                            <th>Delivery Email</th>
+                            <th>Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mark Allen Gbalazeh</td>
+                            <td>Jan 3, 2024</td>
+                            <td>Pending</td>
+                            <td>CABE Tech</td>
+                            <td>test@test.com</td>
+                            <td>Your Document is ready</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Request Transcript Form Modal -->
+<div class="modal fade" id="requestTranscriptModal" tabindex="-1" role="dialog" aria-labelledby="requestTranscriptModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="requestTranscriptModalLabel">Request Transcript</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="request-transcript-form" method="post" action="{% url 'request-transcript-form' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="student">Student</label>
+                        <input type="text" id="student" name="student" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="institution">Institution</label>
+                        <input type="text" id="institution" name="institution" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="doc_type">Document Type</label>
+                        <select id="doc_type" name="doc_type" class="form-control">
+                            {% for value, display in form.fields.doc_type.widget.choices %}
+                                <option value="{{ value }}">{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="request_date">Request Date</label>
+                        <input type="date" id="request_date" name="request_date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="delivery_email">Delivery Email</label>
+                        <input type="email" id="delivery_email" name="delivery_email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="purpose">Purpose</label>
+                        <textarea id="purpose" name="purpose" class="form-control" rows="4"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_script %}
+<script src="{% static 'assets/libs/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'assets/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/libs/sweetalert2/sweetalert2.all.min.js' %}"></script>
+<script src="{% static 'assets/libs/jquery-ui/jquery-ui.min.js' %}"></script>
+<!-- DataTables JS -->
+<script src="{% static 'assets/libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#selection-datatable').DataTable({
+            responsive: true
+        });
+
+        $('#request-document-btn').on('click', function() {
+            Swal.fire({
+                title: 'Do you want to request a document?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Myself',
+                cancelButtonText: 'Other',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Populate form with current user data
+                    $('#student').val('{{ current_user.get_name }}');
+                    $('#institution').val('{{ current_user.administrator_profile.institution_name }}');
+                    $('#student').prop('readonly', true);
+                    $('#institution').prop('readonly', true);
+                    $('#requestTranscriptModal').modal('show');
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // Allow searching for student and institution
+                    $('#student').prop('readonly', false);
+                    $('#institution').prop('readonly', false);
+                    $('#requestTranscriptModal').modal('show');
+                }
+            });
+        });
+
+        $('#student').autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: "{% url 'autocomplete' %}",
+                    dataType: "json",
+                    data: {
+                        term: request.term
+                    },
+                    success: function(data) {
+                        response(data.students);
+                    }
+                });
+            }
+        });
+
+        $('#institution').autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: "{% url 'autocomplete' %}",
+                    dataType: "json",
+                    data: {
+                        term: request.term
+                    },
+                    success: function(data) {
+                        response(data.institutions);
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock custom_script %}

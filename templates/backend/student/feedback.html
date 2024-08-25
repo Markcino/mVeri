@@ -1,0 +1,121 @@
+{% extends 'backend/student/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block custom_css %}
+
+<!-- DataTables CSS -->
+<link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+
+{% endblock custom_css %}
+
+{% block breadcrumb %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Feedback</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Home</a></li>
+                    <li class="breadcrumb-item active">Feedback</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center mb-3">
+                <h3>Submit Feedback</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="review_text">Review</label>
+                        <textarea id="review_text" name="review_text" class="form-control" rows="5" required></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="rating">Rating</label>
+                        <select id="rating" name="rating" class="form-control" required>
+                            <option value="">Select Rating</option>
+                            {% for value, display in rating_choices %}
+                                <option value="{{ value }}">{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="school_rating">School Rating</label>
+                        <select id="school_rating" name="school_rating" class="form-control" required>
+                            <option value="">Select Rating</option>
+                            {% for value, display in rating_choices %}
+                                <option value="{{ value }}">{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center mb-3">
+                <h3>Feedback List</h3>
+            </div>
+            <div class="card-body">
+                <table id="feedback-table" class="table table-bordered dt-responsive nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Review</th>
+                            <th>Rating</th>
+                            <th>School Rating</th>
+                            <th>Date Submitted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for feedback in feedback_list %}
+                            <tr>
+                                <td>{{ feedback.student.user.get_name }}</td>
+                                <td>{{ feedback.review_text }}</td>
+                                <td>{{ feedback.rating }}</td>
+                                <td>{{ feedback.school_rating }}</td>
+                                <td>{{ feedback.created_at }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5">No feedback available.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_script %}
+<script src="{% static 'assets/libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        $('#feedback-table').DataTable({
+            responsive: true
+        });
+    });
+</script>
+{% endblock custom_script %}
