@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('super-admin-dashboard', views.app_administrator_dashboard,
@@ -26,4 +28,4 @@ urlpatterns = [
     path('delete-student/<int:pk>', views.superadmin_delete_student,
          name="delete_student"),
     # End of Student Urls
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

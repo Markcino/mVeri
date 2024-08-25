@@ -2,6 +2,8 @@
 from django.urls import path
 from . import views
 from accounts.utils import hash_url 
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 # urlpatterns_data = [
@@ -23,4 +25,4 @@ urlpatterns = [
     path('autocomplete_institution/', views.autocomplete_institution, name='autocomplete-institution'),
     path('get_user_data/', views.get_user_data, name='get-user-data'),
 
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

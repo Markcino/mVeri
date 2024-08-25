@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
 import random
+from django.core.files.storage import FileSystemStorage
 
 from accounts.models import AdministratorProfile, CustomUser, StudentProfile
 
@@ -127,9 +128,10 @@ def register(request):
                 institution_address = request.POST.get('institution_address')
                 phone_number = request.POST.get('phone_number')
                 business_reg_number = request.POST.get('business_reg_number')
+                business_cert = request.FILES.get('business_cert', None)
 
                 # Check for completeness
-                if not all([institution_name, institution_address, phone_number, business_reg_number]):
+                if not all([institution_name, institution_address, phone_number, business_reg_number, business_cert]):
                     is_complete = False
                     is_incomplete = True
 
