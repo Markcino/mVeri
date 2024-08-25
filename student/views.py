@@ -1,45 +1,9 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
-from accounts.forms import TranscriptRequestForm
+from django.shortcuts import get_object_or_404, render, redirect
+from accounts.forms import RequestForm
 
 from django.http import JsonResponse
-from accounts.models import StudentProfile, AdministratorProfile
-
-def autocomplete_student(request):
-    term = request.GET.get('term', '')
-    students = StudentProfile.objects.filter(name__icontains=term).values_list('name', flat=True)
-    return JsonResponse(list(students), safe=False)
-
-def autocomplete_institution(request):
-    term = request.GET.get('term', '')
-    institutions = AdministratorProfile.objects.filter(institution_name__icontains=term).values_list('institution_name', flat=True)
-    return JsonResponse(list(institutions), safe=False)
-
-def get_user_data(request):
-    if request.user.is_authenticated:
-        user = request.user
-        user_data = {
-            'name': user.get_name,
-            'institution': ''  # Default empty value
-        }
-        
-        if user.is_administrator:
-            admin_profile = getattr(user, 'administrator_profile', None)
-            if admin_profile:
-                user_data['institution'] = getattr(admin_profile, 'institution_name', '')
-        
-        if user.is_student:
-            student_profile = getattr(user, 'student_profile', None)
-            if student_profile:
-                user_data['institution'] = getattr(student_profile, 'institution_name', '')
-        
-        print(user_data)
-        return JsonResponse(user_data)
-    else:
-        return JsonResponse({'error': 'User not authenticated'}, status=401)
-
-    
-    
+from accounts.models import RequestDocument, StudentProfile, AdministratorProfile
 
 
 def student_dashboard(request):
@@ -54,32 +18,51 @@ def request_document(request):
     
     return render(request, "backend/student/request_document.html", context)
 
-def request_transcript_form(request):
+def request_form(request):
     current_user = request.user
-    form = TranscriptRequestForm()
+    student_profile = current_user.student_profile  # Get the StudentProfile instance
+    institution_name = student_profile.school_name
 
-    print(current_user)
+    try:
+        institution_profile = AdministratorProfile.objects.get(institution_name=institution_name)
+    except AdministratorProfile.DoesNotExist:
+        messages.error(request, "Institution not found.")
+        return redirect("request-form")
 
-    if request.method == "POST":
-        form = TranscriptRequestForm(request.POST)
+    if request.method == 'POST':
+        form = RequestForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Transcript Requested Successfully")
-            return redirect("request-transcript")
+            # Manually save the data to the Request model
+            request_obj = RequestDocument.objects.create(
+                student=student_profile,  # Adjust this to match your model's fields
+                institution=institution_profile,
+                sender_email=form.cleaned_data['requester_email'],
+                doc_type = form.cleaned_data['doc_type'],
+                request_date = form.cleaned_data['request_date'],
+                purpose = form.cleaned_data['purpose'],
+                is_pending = True,
+                is_progress = False,
+                is_approve = False,
+                is_rejected = False,
+            )
+            request_obj.save()
+            messages.success(request, "Request for Document Sent Successfully")
+            return redirect("request-document")
         else:
-            messages.error(request, "Transcript Request Failed, Please Try Again")
-            return redirect("request-transcript")
+            messages.error(request, "Your Request for Document Failed, Please Try Again")
     else:
-        form = TranscriptRequestForm()
-    
+        form = RequestForm(initial={
+            'student': current_user.get_name(),
+            'institution': institution_name,
+            'requester_email': current_user.email
+        })
+
     context = {
-        'TranscriptRequestForm': form,
+        'RequestForm': form,
         'current_user': current_user,
     }
 
-
-
-    return render(request, "backend/student/request_transcript_form.html", context)
+    return render(request, "backend/student/request_form.html", context)
 
 def request_history(request):
     return render(request, "backend/student/request_history.html")

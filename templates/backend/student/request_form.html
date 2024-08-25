@@ -34,7 +34,7 @@
             <form method="POST" autocomplete="off" enctype="multipart/form-data">
                 {% csrf_token %}
         
-                {{TranscriptRequestForm|crispy}}
+                {{RequestForm|crispy}}
         
                 <br>
                 <input type="submit" class="btn btn-success" value="submit">

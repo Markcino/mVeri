@@ -43,6 +43,10 @@ class StudentProfile(models.Model):
     is_completed = models.BooleanField(default=False)
     is_incomplete = models.BooleanField(default=True)
 
+    @property
+    def get_institution_name(self):
+        return self.school_name
+
     def __str__(self):
         return f"{self.user.get_name} - Student Profile"
 
@@ -77,13 +81,7 @@ class Subscription(models.Model):
         return f'{self.subscriber_name} - {self.subscription_plan} subscription'
 
 
-class TranscriptRequest(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-        ('rejected', 'Rejected'),
-    ]
+class RequestDocument(models.Model):
     DOC_TYPE_CHOICES = [
         ('None', 'None'),
         ('Degree', 'Degree'),
@@ -97,31 +95,15 @@ class TranscriptRequest(models.Model):
     institution = models.ForeignKey(AdministratorProfile, on_delete=models.CASCADE)
     doc_type = models.CharField(max_length=50, choices=DOC_TYPE_CHOICES, default='None')
     request_date = models.DateTimeField(default=timezone.now)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    delivery_email = models.EmailField()
+    is_pending = models.BooleanField(default=True)
+    is_progress = models.BooleanField(default=False)
+    is_approve = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
+    sender_email = models.EmailField()
     purpose = models.TextField(blank=True, null=True)
     
     def __str__(self):
         return f"Transcript Request by {self.student.user.get_name}"
-
-
-class RecommendationLetterRequest(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-        ('rejected', 'Rejected'),
-    ]
-    
-    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
-    request_date = models.DateTimeField(default=timezone.now)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    recommender_name = models.CharField(max_length=255)
-    delivery_email = models.EmailField()
-    comment = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"Recommendation Request by {self.student.user.get_name}"
 
 
 class Notification(models.Model):
