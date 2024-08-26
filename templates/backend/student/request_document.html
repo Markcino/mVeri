@@ -42,19 +42,34 @@
                             <th>Date Requested</th>
                             <th>Status</th>
                             <th>Institution</th>
-                            <th>Delivery Email</th>
-                            <th>Comments</th>
+                            <th>Document Type</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Mark Allen Gbalazeh</td>
-                            <td>Jan 3, 2024</td>
-                            <td>Pending</td>
-                            <td>CABE Tech</td>
-                            <td>test@test.com</td>
-                            <td>Your Document is ready</td>
-                        </tr>
+                        {% for request_document in request_documents %}
+                            <tr>
+                                <td>{{request_document.student}}</td>
+                                <td>{{request_document.request_date}}</td>
+                                {% if request_document.is_pending == True %}
+                                    <td><span>Pending</span></td>
+                                {% elif request_document.is_progress == True %}
+                                <td><span>In Progress</span></td>
+                                {% elif request_document.is_approved == True %}
+                                    <td><span>Approved</span></td>
+                                {% elif request_document.is_rejected == True %}
+                                <td><span>Rejected</span></td>
+                                {% endif %}
+                                <td>{{request_document.institution}}</td>
+                                <td>{{request_document.doc_type}}</td>
+                                {% if request_document.is_pending %}
+                                <td><a href="#" class="btn btn-success">Edit</a></td>
+                                {% else %}
+                                <td><a href="#" class="btn btn-danger" aria-disabled="true">Edit</a></td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        
                     </tbody>
                 </table>
             </div>

@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect
-from accounts.forms import RequestForm
+from accounts.forms import FeedbackForm, RequestForm
 
 from django.http import JsonResponse
-from accounts.models import RequestDocument, StudentProfile, AdministratorProfile
+from accounts.models import Feedback, RequestDocument, StudentProfile, AdministratorProfile
 
 
 def student_dashboard(request):
@@ -11,9 +11,12 @@ def student_dashboard(request):
 
 def request_document(request):
     current_user = request.user
+    request_documents = RequestDocument.objects.all()
+
 
     context = {
         'current_user': current_user,
+        'request_documents': request_documents,
     }
     
     return render(request, "backend/student/request_document.html", context)
@@ -77,7 +80,29 @@ def student_settings(request):
     return render(request, "backend/student/settings.html")
 
 def student_feedback(request):
-    return render(request, "backend/student/feedback.html")
+
+    current_user = request.user
+    student_feedback = current_user.student_profile  # Get the StudentProfile instance
+    institution_name = student_feedback.school_name
+
+    try:
+        institution_profile = AdministratorProfile.objects.get(institution_name=institution_name)
+    except AdministratorProfile.DoesNotExist:
+        messages.error(request, "Institution not found.")
+        return redirect("request-form")
+    
+    if request.method == 'POST':
+        pass
+    else:
+        form = FeedbackForm(initial={
+            'student': current_user.get_name,
+        })
+    
+    context = {
+        'FeedBackForm': form,
+        'current_user': current_user,
+    }
+    return render(request, "backend/student/feedback.html", context)
 
 
 

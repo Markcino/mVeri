@@ -14,5 +14,13 @@ class RequestForm(forms.Form):
     request_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     doc_type = forms.ChoiceField(choices=RequestDocument.DOC_TYPE_CHOICES)
     purpose = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}))
-    
 
+class FeedbackForm(forms.Form):
+    student = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    platform_rating = forms.ChoiceField(choices=Feedback.RATING_CHOICES)
+    school_rating = forms.ChoiceField(choices=Feedback.RATING_CHOICES)
+    review = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}))
+
+class HelpSupportForm(forms.Form):
+    subject = forms.CharField(widget=forms.TextInput(attrs={'type':'text'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}))

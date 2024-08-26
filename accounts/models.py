@@ -36,6 +36,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 class StudentProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='student_profile')
     school_name = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
     institution_code = models.CharField(max_length=50, blank=True, null=True)
     class_name = models.CharField(max_length=50, blank=True, null=True)
     degree_type = models.CharField(max_length=50, blank=True, null=True)

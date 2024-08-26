@@ -42,7 +42,7 @@
                 <button id="edit-btn" class="btn btn-primary btn-sm">Edit</button>
             </div>
             <div class="card-body">
-                <form method="post" action="{% url 'update-profile' %}">
+                <form method="post" action="">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="profile-image">Profile Image</label>
@@ -60,7 +60,7 @@
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone Number</label>
-                        <input type="text" id="phone" name="phone" class="form-control" value="{{ user.phone_number }}" readonly>
+                        <input type="text" id="phone" name="phone" class="form-control" value="{{ user.student_profile.phone_number }}" readonly>
                     </div>
                     <div class="form-group">
                         <label for="password">New Password</label>
