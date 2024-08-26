@@ -106,7 +106,7 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-4">
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Request Status Overview</h4>
@@ -115,11 +115,11 @@
         </div>
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-lg-8">
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title" style="text-align: center;" >Pending Requests</h4>
-                    <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                    <table id="alternative-page-datatable" class="table dt-responsive nowrap w-100">
                         <thead>
                             <tr>
                                 <th>Student</th>
@@ -128,29 +128,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for request_document in request_documents %}
-                                <tr>
-                                    <td>{{request_document.student}}</td>
-                                    <td>{{request_document.request_date}}</td>
-                                    {% if request_document.is_pending == True %}
-                                        <td><span>Pending</span></td>
-                                    {% elif request_document.is_progress == True %}
-                                    <td><span>In Progress</span></td>
-                                    {% elif request_document.is_approved == True %}
-                                        <td><span>Approved</span></td>
-                                    {% elif request_document.is_rejected == True %}
-                                    <td><span>Rejected</span></td>
-                                    {% endif %}
-                                    <td>{{request_document.institution}}</td>
-                                    <td>{{request_document.doc_type}}</td>
-                                    {% if request_document.is_pending %}
-                                    <td><a href="#" class="btn btn-success">Edit</a></td>
-                                    {% else %}
-                                    <td><a href="#" class="btn btn-danger" aria-disabled="true">Edit</a></td>
-                                    {% endif %}
-                                </tr>
-                            {% endfor %}
+                            {% for all_document_request in all_document_requests %}
+                                
                             
+                            <tr>
+                                <td>{{ all_document_request.student }}</td>
+                                <td>{{ all_document_request.doc_type }}</td>
+                                {% if all_document_request.is_pending == True %}
+                                <td><a href="#" class="btn btn-success">Upload Document</td>
+                                {% elif all_document_request.is_progress == True %}
+                                <td><a href="#" class="btn btn-warning" aria-disabled="true">Upload Document</td>
+                                {% elif all_document_request.is_approved == True %}
+                                <td><a href="#" class="btn btn-warning" aria-disabled="true">Upload Document</td>
+                                {% elif all_document_request.is_rejected == True %}
+                                <td><a href="#" class="btn btn-warning" aria-disabled="true">Upload Document</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
             </div>

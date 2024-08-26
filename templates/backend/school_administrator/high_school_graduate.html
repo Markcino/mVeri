@@ -1,0 +1,135 @@
+{% extends 'backend/school_administrator/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block custom_css %}
+
+{% endblock custom_css %}
+
+{% block breadcrumb %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Dashboard</h4>
+
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">mVeri</a></li>
+                    <li class="breadcrumb-item active">Profile</li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock breadcrumb %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center mb-3">
+                <h3>High School Transcript</h3>
+            </div>
+            
+            <div class="card-body">
+                
+                <div class="container mt-5">
+                    <div class="text-center">
+                        <h3>Christian Missionary Fellowship International</h3>
+                        <p><strong>C.M.F.I Bilingual High School</strong></p>
+                        <p>P.O. Box 6389, Somalia Drive, Paynesville City, Republic of Liberia</p>
+                        <p><strong>Phone:</strong> 0777-003-955 / 0886-551-578</p>
+                    </div>
+                
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Requested Date:</strong> {{ request_date }} </p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <p><strong>Graduation Year:</strong> {{ graduation_date }} </p>
+                        </div>
+                    </div>
+                
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p><strong>Name:</strong> Mark Allen Gbalazeh</p>
+                        </div>
+                    </div>
+                
+                    <h4 class="text-center">Official Transcript</h4>
+                
+                    <!-- Editable Table -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="editableTable">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Subjects</th>
+                                <th>10th Grade</th>
+                                <th>11th Grade</th>
+                                <th>12th Grade</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                            </tr>
+                            <!-- Additional rows go here -->
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td><strong>Average</strong></td>
+                                <td contenteditable="true">83.8%</td>
+                                <td contenteditable="true">85.2%</td>
+                                <td contenteditable="true">86.4%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Conduct</strong></td>
+                                <td contenteditable="true">Good</td>
+                                <td contenteditable="true">Good</td>
+                                <td contenteditable="true">Good</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                
+                    <!-- Buttons to Add and Delete Row -->
+                    <div class="text-end mt-3">
+                        <button class="btn btn-primary" id="addRow"><i class="fas fa-plus"></i> Add Row</button>
+                        <button class="btn btn-danger" id="deleteLastRow"><i class="fas fa-trash-alt"></i> Delete Last Row</button>
+                    </div>
+                
+                    <div class="row mt-5">
+                        <div class="col-md-6 text-start">
+                            <p><strong>Signed:</strong> Registrar</p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <p><strong>Approved:</strong> Principal</p>
+                        </div>
+                    </div>
+                
+                    <p class="text-center text-muted">Any alteration on this document renders it invalid.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block custom_script %}
+<script>
+    // Function to add a new row
+    $('#addRow').click(function() {
+        const newRow = `<tr>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>`;
+        $('#editableTable tbody').append(newRow);
+    });
+
+    // Function to delete the last row
+    $('#deleteLastRow').click(function() {
+        $('#editableTable tbody tr:last').remove();
+    });
+
+</script>
+
+{% endblock custom_script %}
