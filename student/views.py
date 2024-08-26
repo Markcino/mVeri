@@ -1,14 +1,15 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.forms import FeedbackForm, RequestForm
-
 from django.http import JsonResponse
 from accounts.models import Feedback, RequestDocument, StudentProfile, AdministratorProfile
+from django.contrib.auth.decorators import login_required
 
-
+@login_required(login_url='do_login')
 def student_dashboard(request):
     return render(request, "backend/student/index.html")
 
+@login_required(login_url='do_login')
 def request_document(request):
     current_user = request.user
     request_documents = RequestDocument.objects.all()
@@ -21,6 +22,7 @@ def request_document(request):
     
     return render(request, "backend/student/request_document.html", context)
 
+@login_required(login_url='do_login')
 def request_form(request):
     current_user = request.user
     student_profile = current_user.student_profile  # Get the StudentProfile instance
@@ -66,19 +68,19 @@ def request_form(request):
     }
 
     return render(request, "backend/student/request_form.html", context)
-
+@login_required(login_url='do_login')
 def request_history(request):
     return render(request, "backend/student/request_history.html")
-
+@login_required(login_url='do_login')
 def student_notifications(request):
     return render(request, "backend/student/notifications.html")
-
+@login_required(login_url='do_login')
 def help_support(request):
     return render(request, "backend/student/help_support.html")
 
 def student_settings(request):
     return render(request, "backend/student/settings.html")
-
+@login_required(login_url='do_login')
 def student_feedback(request):
 
     current_user = request.user
@@ -105,9 +107,10 @@ def student_feedback(request):
     return render(request, "backend/student/feedback.html", context)
 
 
-
+@login_required(login_url='do_login')
 def student_profile(request):
     return render(request, "backend/student/profile.html")
 
+@login_required(login_url='do_login')
 def update_profile(request):
     pass

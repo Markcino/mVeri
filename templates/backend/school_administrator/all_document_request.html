@@ -1,0 +1,107 @@
+{% extends 'backend/school_administrator/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block custom_css %}
+<!-- DataTables CSS -->
+<link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+<!-- SweetAlert CSS -->
+<link href="{% static 'assets/libs/sweetalert2/sweetalert2.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock custom_css %}
+
+{% block breadcrumb %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Dashboard</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">mVeri</a></li>
+                    <li class="breadcrumb-item active">Request Document</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center mb-3">
+                <h2 class="card-title mb-0">All Requested Document</h2>
+            </div>
+            <div class="card-body">
+                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Date Requested</th>
+                            <th>Status</th>
+                            <th>Document Type</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for all_document_request in all_document_requests %}
+                            
+                        
+                        <tr>
+                            <td>{{ all_document_request.student }}</td>
+                            <td>{{ all_document_request.request_date }}</td>
+                            {% if all_document_request.is_pending == True %}
+                            <td><span>Pending</span></td>
+                            {% elif all_document_request.is_progress == True %}
+                            <td><span>In Progress</span></td>
+                            {% elif all_document_request.is_approved == True %}
+                            <td><span>Approved</span></td>
+                            {% elif all_document_request.is_rejected == True %}
+                            <td><span>Rejected</span></td>
+                            {% endif %}
+                            <td>{{ all_document_request.doc_type }}</td>
+
+                            {% if all_document_request.is_pending == True %}
+                            <td><a href="#" class="btn btn-success">Approved & Upload Document</td>
+                            {% elif all_document_request.is_progress == True %}
+                            <td><a href="#" class="btn btn-warning" aria-disabled="true">Approved & Upload Document</td>
+                            {% elif all_document_request.is_approved == True %}
+                            <td><a href="#" class="btn btn-warning" aria-disabled="true">Approved & Upload Document</td>
+                            {% elif all_document_request.is_rejected == True %}
+                            <td><a href="#" class="btn btn-warning" aria-disabled="true">Approved & Upload Document</td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-group">
+                {% if messages %}
+                {% for message in messages %}
+                {% if message.tags == 'success' %}
+                <script src="{% static 'assets/libs/sweetalert2/sweetalert2.min.js' %}"></script>
+                <script>
+                    swal("SAVED!", '{{message}}', "success")
+                </script>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_script %}
+<script src="{% static 'assets/libs/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'assets/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/libs/sweetalert2/sweetalert2.all.min.js' %}"></script>
+<script src="{% static 'assets/libs/jquery-ui/jquery-ui.min.js' %}"></script>
+<!-- DataTables JS -->
+<script src="{% static 'assets/libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+
+{% endblock custom_script %}
