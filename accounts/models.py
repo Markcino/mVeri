@@ -105,6 +105,31 @@ class RequestDocument(models.Model):
     
     def __str__(self):
         return f"Transcript Request by {self.student.user.get_name}"
+    
+class TranscriptGenerated(models.Model):
+
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='transcripts')
+    institution = models.ForeignKey(AdministratorProfile, on_delete=models.CASCADE, related_name='transcripts')
+    graduation_year = models.PositiveIntegerField()
+    requested_date = models.DateTimeField(default=timezone.now)
+    subject = models.CharField(max_length=255)
+    grade_10 = models.CharField(max_length=5, blank=True, null=True)
+    grade_11 = models.CharField(max_length=5, blank=True, null=True)
+    grade_12 = models.CharField(max_length=5, blank=True, null=True)
+    grade_10_average = models.CharField(max_length=50, blank=True, null=True)
+    grade_11_average = models.CharField(max_length=50, blank=True, null=True)
+    grade_12_average = models.CharField(max_length=50, blank=True, null=True)
+    grade_10_conduct = models.CharField(max_length=50, blank=True, null=True)
+    grade_11_conduct = models.CharField(max_length=50, blank=True, null=True)
+    grade_12_conduct = models.CharField(max_length=50, blank=True, null=True)
+
+    registrar_signed = models.BooleanField(default=False)
+    principal_approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.student.user.get_name
+    
+
 
 
 class Notification(models.Model):

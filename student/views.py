@@ -12,8 +12,9 @@ def student_dashboard(request):
 @login_required(login_url='do_login')
 def request_document(request):
     current_user = request.user
-    request_documents = RequestDocument.objects.all()
 
+    # Filter the documents to only show the ones created by the current user (student)
+    request_documents = RequestDocument.objects.filter(student__user=current_user)
 
     context = {
         'current_user': current_user,
@@ -21,6 +22,7 @@ def request_document(request):
     }
     
     return render(request, "backend/student/request_document.html", context)
+
 
 @login_required(login_url='do_login')
 def request_form(request):
@@ -57,7 +59,7 @@ def request_form(request):
             messages.error(request, "Your Request for Document Failed, Please Try Again")
     else:
         form = RequestForm(initial={
-            'student': current_user.get_name(),
+            'student': current_user.get_name,
             'institution': institution_name,
             'requester_email': current_user.email
         })

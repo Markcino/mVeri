@@ -1,6 +1,9 @@
+import json
+
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from accounts.models import AdministratorProfile, StudentProfile, CustomUser, RequestDocument
+from accounts.models import AdministratorProfile, StudentProfile, CustomUser, RequestDocument, TranscriptGenerated
 
 # Create your views here.
 @login_required(login_url='do_login')
@@ -45,6 +48,9 @@ def upload_document(request, request_document_id):
     graduation_date = student_profile.graduation_date
     class_name = student_profile.class_name.lower()  
     request_date = document_request.request_date
+    institution_name = current_user.administrator_profile.institution_name
+    institution_address = current_user.administrator_profile.institution_address
+    phone_number = current_user.administrator_profile.phone_number
 
     # Define class categories in lowercase
     junior_classes = [
@@ -64,12 +70,19 @@ def upload_document(request, request_document_id):
             'student_email': student_email,
             'graduation_date': graduation_date,
             'request_date': request_date,
+            'institution_name': institution_name,
+            'institution_address': institution_address,
+            'phone_number': phone_number,
         })
     elif class_name in senior_high_graduate:
         return render(request, "backend/school_administrator/high_school_graduate.html", {
             'student_name': student_name,
             'student_email': student_email,
+            'graduation_date': graduation_date,
             'request_date': request_date,
+            'institution_name': institution_name,
+            'institution_address': institution_address,
+            'phone_number': phone_number,
         })
     elif class_name in university_graduate:
         return render(request, "backend/school_administrator/university_graduate.html", {
@@ -77,10 +90,62 @@ def upload_document(request, request_document_id):
             'student_email': student_email,
             'graduation_date': graduation_date,
             'request_date': request_date,
+            'institution_name': institution_name,
+            'institution_address': institution_address,
+            'phone_number': phone_number,
         })
 
     return redirect('all_document_request')
 
+def create_transcript(request):
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        student = request.POST.get('student')
+        institution = request.POST.get('institution')
+        graduation_year = request.POST.get('graduation_year')
+        requested_date = request.POST.get('requested_date')
+        subject = request.POST.get('subject')
+        grade_10_average = request.POST.get('grade_10_average')
+        grade_11_average = request.POST.get('grade_11_average')
+        grade_12_average = request.POST.get('grade_12_average')
+        grade_10_conduct = request.POST.get('grade_10_conduct')
+        grade_11_conduct = request.POST.get('grade_11_conduct')
+        grade_12_conduct = request.POST.get('grade_12_conduct')
+        registrar_signed = request.POST.get('registrar_signed') == 'on'
+        principal_approved = request.POST.get('principal_approved') == 'on'
+        table_data = request.POST.get('table_data')
+
+        # Convert the JSON string to a list of dictionaries
+        table_data = json.loads(table_data)
+
+        transcript = TranscriptGenerated.objects.create(
+            student=student,
+            institution=institution,
+            graduation_year=graduation_year,
+            requested_date=requested_date,
+            subject=subject,
+            grade_10_average=grade_10_average,
+            grade_11_average=grade_11_average,
+            grade_12_average=grade_12_average,
+            grade_10_conduct=grade_10_conduct,
+            grade_11_conduct=grade_11_conduct,
+            grade_12_conduct=grade_12_conduct,
+            registrar_signed=registrar_signed,
+            principal_approved=principal_approved
+        )
+
+        # Save the table data to the database
+        for row_data in table_data:
+            TranscriptGenerated.objects.create(
+                subject=row_data['subject'],
+                grade_10=row_data['grade_10'],
+                grade_11=row_data['grade_11'],
+                grade_12=row_data['grade_12'],
+                transcript=transcript,
+            )
+
+        return JsonResponse({'success': True})
+
+    return JsonResponse({'success': False})
 
 @login_required(login_url='do_login')
 def school_admin_help_support(request):

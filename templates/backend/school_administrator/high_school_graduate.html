@@ -34,10 +34,9 @@
                 
                 <div class="container mt-5">
                     <div class="text-center">
-                        <h3>Christian Missionary Fellowship International</h3>
-                        <p><strong>C.M.F.I Bilingual High School</strong></p>
-                        <p>P.O. Box 6389, Somalia Drive, Paynesville City, Republic of Liberia</p>
-                        <p><strong>Phone:</strong> 0777-003-955 / 0886-551-578</p>
+                        <h3>{{institution_name}}</h3>
+                        <p>{{institution_address}}</p>
+                        <p><strong>Phone:</strong> {{phone_number}}</p>
                     </div>
                 
                     <div class="row">
@@ -51,7 +50,7 @@
                 
                     <div class="row">
                         <div class="col-md-12">
-                            <p><strong>Name:</strong> Mark Allen Gbalazeh</p>
+                            <p><strong>Name:</strong>{{ student_name }} </p>
                         </div>
                     </div>
                 
@@ -76,9 +75,9 @@
                             <tfoot>
                             <tr>
                                 <td><strong>Average</strong></td>
-                                <td contenteditable="true">83.8%</td>
-                                <td contenteditable="true">85.2%</td>
-                                <td contenteditable="true">86.4%</td>
+                                <td contenteditable="true"></td>
+                                <td contenteditable="true"></td>
+                                <td contenteditable="true"></td>
                             </tr>
                             <tr>
                                 <td><strong>Conduct</strong></td>
@@ -94,6 +93,7 @@
                     <div class="text-end mt-3">
                         <button class="btn btn-primary" id="addRow"><i class="fas fa-plus"></i> Add Row</button>
                         <button class="btn btn-danger" id="deleteLastRow"><i class="fas fa-trash-alt"></i> Delete Last Row</button>
+                        <button class="btn btn-success" id="submitForm"><i class="fas fa-save"></i> Save Transcript</button>
                     </div>
                 
                     <div class="row mt-5">
@@ -112,24 +112,116 @@
     </div>
 </div>
 {% endblock content %}
+
 {% block custom_script %}
 <script>
-    // Function to add a new row
-    $('#addRow').click(function() {
-        const newRow = `<tr>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
+    const student = "{{ student_name }}"; 
+const institution = "{{ institution_name }}";
+const graduation_year = "{{ graduation_date }}";
+const requested_date = "{{ request_date }}";
+
+// Function to add a new row
+$('#addRow').click(function() {
+    const newRow = `<tr>
+                <td contenteditable="true" class="subject-cell"></td>
+                <td contenteditable="true" class="grade-cell" data-grade="10"></td>
+                <td contenteditable="true" class="grade-cell" data-grade="11"></td>
+                <td contenteditable="true" class="grade-cell" data-grade="12"></td>
             </tr>`;
-        $('#editableTable tbody').append(newRow);
+    $('#editableTable tbody').append(newRow);
+});
+
+// Function to delete the last row
+$('#deleteLastRow').click(function() {
+    $('#editableTable tbody tr:last').remove();
+    calculateAverage();
+});
+
+// Function to calculate the average for each grade
+function calculateAverage() {
+    const gradeTotals = {10: 0, 11: 0, 12: 0};  // Holds the total sum of grades
+    const gradeCounts = {10: 0, 11: 0, 12: 0};  // Holds the count of valid grades
+    const rows = $('#editableTable tbody tr');
+
+    // Loop through each row and collect the grade data
+    rows.each(function() {
+        $(this).find('.grade-cell').each(function() {
+            const gradeLevel = $(this).data('grade');
+            const gradeValue = parseFloat($(this).text());
+
+            if (!isNaN(gradeValue)) {
+                gradeTotals[gradeLevel] += gradeValue;  // Add valid grades to the total
+                gradeCounts[gradeLevel] += 1;           // Increment the count of valid grades
+            }
+        });
     });
 
-    // Function to delete the last row
-    $('#deleteLastRow').click(function() {
-        $('#editableTable tbody tr:last').remove();
+    // Update the average for each grade level
+    for (let gradeLevel in gradeTotals) {
+        const total = gradeTotals[gradeLevel];
+        const count = gradeCounts[gradeLevel];
+        const average = count > 0 ? (total / count).toFixed(2) : '0.00';
+
+        // Update the footer cell with the calculated average
+        $(`#editableTable tfoot td:eq(${gradeLevel - 10 + 1})`).text(average);  // Properly target the footer cell
+    }
+}
+
+// Attach the input event listener to dynamically calculate the averages
+$(document).on('input', '.grade-cell', function() {
+    calculateAverage();
+});
+
+// Function to submit the editable table data
+$('#submitForm').click(function() {
+    const tableData = [];
+
+    // Get all the rows in the table
+    const rows = $('#editableTable tbody tr');
+
+    // Loop through each row and collect the data
+    rows.each(function() {
+        const rowData = {
+            subject: $(this).find('.subject-cell').text(),
+            grade_10: $(this).find('.grade-cell[data-grade="10"]').text(),
+            grade_11: $(this).find('.grade-cell[data-grade="11"]').text(),
+            grade_12: $(this).find('.grade-cell[data-grade="12"]').text()
+        };
+
+        tableData.push(rowData);
     });
 
+    // Collect additional form data
+    const formData = new FormData();
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    formData.append('student', studentProfile);
+    formData.append('institution', institution);
+    formData.append('graduation_year', graduation_year);
+    formData.append('requested_date', requested_date);
+    formData.append('grade_10_average', grade_10_average);
+    formData.append('grade_11_average', grade_11_average);
+    formData.append('grade_12_average', grade_12_average);
+    formData.append('grade_10_conduct', grade_10_conduct);
+    formData.append('grade_11_conduct', grade_11_conduct);
+    formData.append('grade_12_conduct', grade_12_conduct);
+    formData.append('registrar_signed', registrar_signed);
+    formData.append('principal_approved', principal_approved);
+    formData.append('table_data', JSON.stringify(tableData));
+
+    // Send the data to the server using AJAX
+    $.ajax({
+        url: '/schooladmin/create_transcript',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log('Transcript saved successfully!');
+        },
+        error: function(xhr, status, error) {
+            console.error('Error saving transcript:', error);
+        }
+    });
+});
 </script>
-
 {% endblock custom_script %}
