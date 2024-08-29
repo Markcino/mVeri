@@ -1,9 +1,11 @@
+from datetime import datetime
 import json
-
+from decimal import Decimal, InvalidOperation
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from accounts.models import AdministratorProfile, StudentProfile, CustomUser, RequestDocument, TranscriptGenerated
+from accounts.models import AdministratorProfile, StudentProfile, CustomUser, RequestDocument 
+from .models import TranscriptGenerated
 
 # Create your views here.
 @login_required(login_url='do_login')
@@ -46,7 +48,7 @@ def upload_document(request, request_document_id):
     student_name = student_profile.user.get_name
     student_email = student_profile.user.email
     graduation_date = student_profile.graduation_date
-    class_name = student_profile.class_name.lower()  
+    class_name = student_profile.class_name 
     request_date = document_request.request_date
     institution_name = current_user.administrator_profile.institution_name
     institution_address = current_user.administrator_profile.institution_address
@@ -97,55 +99,58 @@ def upload_document(request, request_document_id):
 
     return redirect('all_document_request')
 
+
 def create_transcript(request):
-    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        student = request.POST.get('student')
-        institution = request.POST.get('institution')
+    if request.method == 'POST':
+        student_name = request.POST.get('student')
+        institution_name = request.POST.get('institution')
         graduation_year = request.POST.get('graduation_year')
         requested_date = request.POST.get('requested_date')
-        subject = request.POST.get('subject')
-        grade_10_average = request.POST.get('grade_10_average')
-        grade_11_average = request.POST.get('grade_11_average')
-        grade_12_average = request.POST.get('grade_12_average')
-        grade_10_conduct = request.POST.get('grade_10_conduct')
-        grade_11_conduct = request.POST.get('grade_11_conduct')
-        grade_12_conduct = request.POST.get('grade_12_conduct')
-        registrar_signed = request.POST.get('registrar_signed') == 'on'
-        principal_approved = request.POST.get('principal_approved') == 'on'
-        table_data = request.POST.get('table_data')
+        
+        table_data = json.loads(request.POST.get('table_data'))
 
-        # Convert the JSON string to a list of dictionaries
-        table_data = json.loads(table_data)
+        # Get the related student and institution profiles
+        student = get_object_or_404(StudentProfile, user__first_name__icontains=student_name.split()[0], 
+                                    user__last_name__icontains=student_name.split()[1])
+        institution = get_object_or_404(AdministratorProfile, institution_name=institution_name)
 
-        transcript = TranscriptGenerated.objects.create(
-            student=student,
-            institution=institution,
-            graduation_year=graduation_year,
-            requested_date=requested_date,
-            subject=subject,
-            grade_10_average=grade_10_average,
-            grade_11_average=grade_11_average,
-            grade_12_average=grade_12_average,
-            grade_10_conduct=grade_10_conduct,
-            grade_11_conduct=grade_11_conduct,
-            grade_12_conduct=grade_12_conduct,
-            registrar_signed=registrar_signed,
-            principal_approved=principal_approved
-        )
+        # Track created subjects to prevent duplicates
+        created_subjects = set()
 
-        # Save the table data to the database
-        for row_data in table_data:
-            TranscriptGenerated.objects.create(
-                subject=row_data['subject'],
-                grade_10=row_data['grade_10'],
-                grade_11=row_data['grade_11'],
-                grade_12=row_data['grade_12'],
-                transcript=transcript,
-            )
+        # Validate and save each row of table data
+        for row in table_data:
+            subject = row.get('subject', '')
+            grade_10 = row.get('grade_10', '')
+            grade_11 = row.get('grade_11', '')
+            grade_12 = row.get('grade_12', '')
 
-        return JsonResponse({'success': True})
+            try:
+                grade_10 = Decimal(grade_10) if grade_10 else None
+                grade_11 = Decimal(grade_11) if grade_11 else None
+                grade_12 = Decimal(grade_12) if grade_12 else None
+            except InvalidOperation:
+                return JsonResponse({'error': 'Invalid decimal value in grades'}, status=400)
 
-    return JsonResponse({'success': False})
+            # Create a unique identifier for the transcript entry
+            transcript_identifier = (student, institution, graduation_year, subject)
+
+            if transcript_identifier not in created_subjects:
+                created_subjects.add(transcript_identifier)
+                TranscriptGenerated.objects.create(
+                    student=student,
+                    institution=institution,
+                    graduation_year=graduation_year,
+                    requested_date=requested_date,
+                    subject=subject,
+                    grade_10=grade_10,
+                    grade_11=grade_11,
+                    grade_12=grade_12,
+                )
+        
+        return JsonResponse({'message': 'Transcript saved successfully!'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 @login_required(login_url='do_login')
 def school_admin_help_support(request):

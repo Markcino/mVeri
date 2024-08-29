@@ -75,15 +75,15 @@
                             <tfoot>
                             <tr>
                                 <td><strong>Average</strong></td>
-                                <td contenteditable="true"></td>
-                                <td contenteditable="true"></td>
-                                <td contenteditable="true"></td>
+                                <td><input type="text" class="form-control average-cell" readonly /></td>
+                                <td><input type="text" class="form-control average-cell" readonly /></td>
+                                <td><input type="text" class="form-control average-cell" readonly /></td>
                             </tr>
                             <tr>
                                 <td><strong>Conduct</strong></td>
-                                <td contenteditable="true">Good</td>
-                                <td contenteditable="true">Good</td>
-                                <td contenteditable="true">Good</td>
+                                <td>Good</td>
+                                <td>Good</td>
+                                <td>Good</td>
                             </tr>
                             </tfoot>
                         </table>
@@ -114,114 +114,132 @@
 {% endblock content %}
 
 {% block custom_script %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const student = "{{ student_name }}"; 
-const institution = "{{ institution_name }}";
-const graduation_year = "{{ graduation_date }}";
-const requested_date = "{{ request_date }}";
+    const institution = "{{ institution_name }}";
+    const graduation_year = "{{ graduation_date }}";
+    const requested_date = "{{ request_date }}";
 
-// Function to add a new row
-$('#addRow').click(function() {
-    const newRow = `<tr>
-                <td contenteditable="true" class="subject-cell"></td>
-                <td contenteditable="true" class="grade-cell" data-grade="10"></td>
-                <td contenteditable="true" class="grade-cell" data-grade="11"></td>
-                <td contenteditable="true" class="grade-cell" data-grade="12"></td>
-            </tr>`;
-    $('#editableTable tbody').append(newRow);
-});
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
 
-// Function to delete the last row
-$('#deleteLastRow').click(function() {
-    $('#editableTable tbody tr:last').remove();
-    calculateAverage();
-});
+    // Function to add a new row
+    $('#addRow').click(function() {
+        const newRow = `<tr>
+            <td><input type="text" class="form-control subject-cell" placeholder="Subject" /></td>
+            <td><input type="number" class="form-control grade-cell" data-grade="10" placeholder="Grade"/></td>
+            <td><input type="number" class="form-control grade-cell" data-grade="11" placeholder="Grade"/></td>
+            <td><input type="number" class="form-control grade-cell" data-grade="12" placeholder="Grade"/></td>
+        </tr>`;
+        $('#editableTable tbody').append(newRow);
+    });
 
-// Function to calculate the average for each grade
-function calculateAverage() {
-    const gradeTotals = {10: 0, 11: 0, 12: 0};  // Holds the total sum of grades
-    const gradeCounts = {10: 0, 11: 0, 12: 0};  // Holds the count of valid grades
-    const rows = $('#editableTable tbody tr');
+    // Function to delete the last row
+    $('#deleteLastRow').click(function() {
+        $('#editableTable tbody tr:last').remove();
+        calculateAverage();
+    });
 
-    // Loop through each row and collect the grade data
-    rows.each(function() {
-        $(this).find('.grade-cell').each(function() {
-            const gradeLevel = $(this).data('grade');
-            const gradeValue = parseFloat($(this).text());
+    // Function to calculate the average for each grade
+    function calculateAverage() {
+        const gradeTotals = {10: 0, 11: 0, 12: 0};
+        const gradeCounts = {10: 0, 11: 0, 12: 0};
+        const rows = $('#editableTable tbody tr');
 
-            if (!isNaN(gradeValue)) {
-                gradeTotals[gradeLevel] += gradeValue;  // Add valid grades to the total
-                gradeCounts[gradeLevel] += 1;           // Increment the count of valid grades
+        rows.each(function() {
+            $(this).find('.grade-cell').each(function() {
+                const gradeLevel = $(this).data('grade');
+                const gradeValue = parseFloat($(this).val());
+
+                if (!isNaN(gradeValue)) {
+                    gradeTotals[gradeLevel] += gradeValue;
+                    gradeCounts[gradeLevel] += 1;
+                }
+            });
+        });
+
+        for (let gradeLevel in gradeTotals) {
+            const total = gradeTotals[gradeLevel];
+            const count = gradeCounts[gradeLevel];
+            const average = count > 0 ? (total / count).toFixed(2) : '0.00';
+            $(`#editableTable tfoot td:eq(${gradeLevel - 10 + 1}) .average-cell`).val(average);
+        }
+    }
+
+    $(document).on('input', '.grade-cell', function() {
+        calculateAverage();
+    });
+
+    // Function to submit the editable table data
+    $('#submitForm').click(function() {
+        const $button = $(this);
+        $button.prop('disabled', true);  // Disable the button
+
+        const tableData = [];
+        const rows = $('#editableTable tbody tr');
+
+        rows.each(function() {
+            const rowData = {
+                subject: $(this).find('.subject-cell').val(),
+                grade_10: $(this).find('.grade-cell[data-grade="10"]').val(),
+                grade_11: $(this).find('.grade-cell[data-grade="11"]').val(),
+                grade_12: $(this).find('.grade-cell[data-grade="12"]').val()
+            };
+
+            tableData.push(rowData);
+        });
+
+        $.ajax({
+            url: '/schooladmin/create_transcript',
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken  // Include CSRF token in headers
+            },
+            data: {
+                student: student,
+                institution: institution,
+                graduation_year: graduation_year,
+                requested_date: requested_date,
+                table_data: JSON.stringify(tableData)
+            },
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Transcript saved successfully!',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/schooladmin/all_document_request';
+                    }
+                });
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to save transcript. Please try again.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    $button.prop('disabled', false);  // Re-enable the button
+                });
             }
         });
     });
-
-    // Update the average for each grade level
-    for (let gradeLevel in gradeTotals) {
-        const total = gradeTotals[gradeLevel];
-        const count = gradeCounts[gradeLevel];
-        const average = count > 0 ? (total / count).toFixed(2) : '0.00';
-
-        // Update the footer cell with the calculated average
-        $(`#editableTable tfoot td:eq(${gradeLevel - 10 + 1})`).text(average);  // Properly target the footer cell
-    }
-}
-
-// Attach the input event listener to dynamically calculate the averages
-$(document).on('input', '.grade-cell', function() {
-    calculateAverage();
-});
-
-// Function to submit the editable table data
-$('#submitForm').click(function() {
-    const tableData = [];
-
-    // Get all the rows in the table
-    const rows = $('#editableTable tbody tr');
-
-    // Loop through each row and collect the data
-    rows.each(function() {
-        const rowData = {
-            subject: $(this).find('.subject-cell').text(),
-            grade_10: $(this).find('.grade-cell[data-grade="10"]').text(),
-            grade_11: $(this).find('.grade-cell[data-grade="11"]').text(),
-            grade_12: $(this).find('.grade-cell[data-grade="12"]').text()
-        };
-
-        tableData.push(rowData);
-    });
-
-    // Collect additional form data
-    const formData = new FormData();
-    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-    formData.append('student', studentProfile);
-    formData.append('institution', institution);
-    formData.append('graduation_year', graduation_year);
-    formData.append('requested_date', requested_date);
-    formData.append('grade_10_average', grade_10_average);
-    formData.append('grade_11_average', grade_11_average);
-    formData.append('grade_12_average', grade_12_average);
-    formData.append('grade_10_conduct', grade_10_conduct);
-    formData.append('grade_11_conduct', grade_11_conduct);
-    formData.append('grade_12_conduct', grade_12_conduct);
-    formData.append('registrar_signed', registrar_signed);
-    formData.append('principal_approved', principal_approved);
-    formData.append('table_data', JSON.stringify(tableData));
-
-    // Send the data to the server using AJAX
-    $.ajax({
-        url: '/schooladmin/create_transcript',
-        method: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            console.log('Transcript saved successfully!');
-        },
-        error: function(xhr, status, error) {
-            console.error('Error saving transcript:', error);
-        }
-    });
-});
 </script>
 {% endblock custom_script %}
+
